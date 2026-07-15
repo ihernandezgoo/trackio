@@ -1,0 +1,19 @@
+{
+  "registros_peso": {
+    "registro_id": "uuid-o-autoincremental",
+    "usuario_id": "temporal_string_o_uid_futuro",
+    "peso": {
+      "valor": 78.5,
+      "unidad": "kg"
+    },
+    "fecha_hora": "2026-07-15T08:30:00Z",
+    "nota": "opcional, texto libre (ej: 'después de correr')",
+    "condicion": {
+      "en_ayunas": true,
+      "momento_dia": "mañana"
+    },
+    "dispositivo": "manual",
+    "creado_en": "2026-07-15T08:30:05Z",
+    "actualizado_en": "2026-07-15T08:30:05Z"
+  }
+}
