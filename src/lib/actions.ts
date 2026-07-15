@@ -3,16 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { ref, push, set, remove, get } from "firebase/database";
 import { db } from "@/lib/firebase";
+import { requireUsuario } from "@/lib/session";
 import type { Registro } from "@/lib/registros";
 
 export async function getRegistros(): Promise<Registro[]> {
-  const snapshot = await get(ref(db, "registros_peso"));
+  const usuario = await requireUsuario();
+  const snapshot = await get(ref(db, `registros_peso/${usuario.uid}`));
 
   if (!snapshot.exists()) return [];
 
   const registros: Registro[] = [];
   snapshot.forEach((child) => {
-    registros.push({ id: child.key as string, ...child.val() });
+    registros.push({ id: child.key as string, usuario_id: usuario.uid, ...child.val() });
   });
 
   return registros.sort((a, b) => b.fecha_hora.localeCompare(a.fecha_hora));
@@ -26,6 +28,8 @@ function momentoDelDiaActual(): "mañana" | "tarde" | "noche" {
 }
 
 export async function crearRegistroRapido(formData: FormData) {
+  const usuario = await requireUsuario();
+
   const pesoTexto = String(formData.get("peso") ?? "").replace(",", ".");
   const valor = Number(pesoTexto);
   const nota = String(formData.get("nota") ?? "").trim();
@@ -35,10 +39,9 @@ export async function crearRegistroRapido(formData: FormData) {
   }
 
   const now = new Date().toISOString();
-  const nuevoRef = push(ref(db, "registros_peso"));
+  const nuevoRef = push(ref(db, `registros_peso/${usuario.uid}`));
 
   await set(nuevoRef, {
-    usuario_id: "temporal",
     peso: { valor, unidad: "kg" },
     fecha_hora: now,
     nota: nota || null,
@@ -54,7 +57,8 @@ export async function crearRegistroRapido(formData: FormData) {
 }
 
 export async function borrarRegistro(id: string) {
-  await remove(ref(db, `registros_peso/${id}`));
+  const usuario = await requireUsuario();
+  await remove(ref(db, `registros_peso/${usuario.uid}/${id}`));
   revalidatePath("/");
   revalidatePath("/history");
   revalidatePath("/goals");

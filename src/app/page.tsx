@@ -1,5 +1,6 @@
 import { getRegistros } from "@/lib/actions";
 import { calcularCambio, calcularRachaActual, porcentajeDiasDelMes } from "@/lib/stats";
+import { getUsuarioActual } from "@/lib/session";
 import AnilloProgreso from "@/components/AnilloProgreso";
 import MiniAnillo from "@/components/MiniAnillo";
 import ModalRegistrarPeso from "@/components/ModalRegistrarPeso";
@@ -13,7 +14,9 @@ function nombreDelDia() {
 
 export default async function Home() {
   const registros = await getRegistros();
+  const usuario = await getUsuarioActual();
   const ultimoPeso = registros[0]?.peso.valor ?? null;
+  const nombreUsuario = usuario?.email?.split("@")[0] ?? "usuario";
 
   const racha = calcularRachaActual(registros);
   const cambioSemanal = calcularCambio(registros, 7);
@@ -23,7 +26,7 @@ export default async function Home() {
     <main className="flex w-full flex-col gap-8 px-6 pt-8 pb-6">
       <header>
         <h1 className="text-2xl font-bold">{nombreDelDia()}</h1>
-        <p className="text-sm text-[var(--text-secondary)]">Bienvenido de nuevo a Trackio</p>
+        <p className="text-sm text-[var(--text-secondary)]">Hola, {nombreUsuario}</p>
       </header>
 
       <div className="flex flex-col items-center gap-6">
