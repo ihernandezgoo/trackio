@@ -16,6 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Trackio · Registro de peso",
   description: "Lleva el control de tu peso diario",
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport = {
+  themeColor: "#4a3aa7",
 };
 
 export default function RootLayout({

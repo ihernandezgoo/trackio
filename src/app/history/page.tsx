@@ -2,7 +2,9 @@ import { getRegistros } from "@/lib/actions";
 import { calcularCambio, ultimos7Dias } from "@/lib/stats";
 import TarjetaCambio from "@/components/TarjetaCambio";
 import TablaRegistros from "@/components/TablaRegistros";
+import FiltrosHistorial from "@/components/FiltrosHistorial";
 import GraficoSemanal from "@/components/GraficoSemanal";
+import TabsHistorial from "@/components/TabsHistorial";
 
 export default async function HistoryPage() {
   const registros = await getRegistros();
@@ -22,27 +24,29 @@ export default async function HistoryPage() {
         </div>
       </header>
 
-      <section className="rounded-2xl bg-[var(--surface)] p-5 shadow-sm ring-1 ring-[var(--border)]">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="font-semibold">Resumen</h2>
-            <p className="text-xs text-[var(--text-secondary)]">Esta semana</p>
+      <TabsHistorial
+        historial={
+          <div className="flex flex-col gap-6">
+            <section className="rounded-2xl bg-[var(--surface)] p-5 shadow-sm ring-1 ring-[var(--border)]">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="font-semibold">Resumen</h2>
+                  <p className="text-xs text-[var(--text-secondary)]">Esta semana</p>
+                </div>
+              </div>
+              <GraficoSemanal dias={semana} />
+            </section>
+
+            <section className="grid grid-cols-2 gap-3">
+              <TarjetaCambio titulo="Diario" cambio={cambioDiario} />
+              <TarjetaCambio titulo="Semanal" cambio={cambioSemanal} />
+              <TarjetaCambio titulo="Mensual" cambio={cambioMensual} />
+              <TarjetaCambio titulo="Anual" cambio={cambioAnual} />
+            </section>
           </div>
-        </div>
-        <GraficoSemanal dias={semana} />
-      </section>
-
-      <section className="grid grid-cols-2 gap-3">
-        <TarjetaCambio titulo="Diario" cambio={cambioDiario} />
-        <TarjetaCambio titulo="Semanal" cambio={cambioSemanal} />
-        <TarjetaCambio titulo="Mensual" cambio={cambioMensual} />
-        <TarjetaCambio titulo="Anual" cambio={cambioAnual} />
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="font-semibold">Todos los registros</h2>
-        <TablaRegistros registros={registros} />
-      </section>
+        }
+        filtros={<FiltrosHistorial registros={registros} />}
+      />
     </main>
   );
 }

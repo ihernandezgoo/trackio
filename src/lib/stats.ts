@@ -29,7 +29,14 @@ export function calcularCambio(registros: Registro[], dias: number): Cambio {
 }
 
 function claveDia(fecha: Date): string {
-  return fecha.toISOString().slice(0, 10);
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+  const dia = String(fecha.getDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
+}
+
+export function diaClaveHoy(): string {
+  return claveDia(new Date());
 }
 
 export function diasConRegistro(registros: Registro[]): Set<string> {
@@ -100,20 +107,20 @@ export type DiaHeatmap = {
   completado: boolean;
 };
 
-export function generarHeatmap(registros: Registro[], semanas = 53): DiaHeatmap[] {
+export function generarHeatmap(registros: Registro[]): DiaHeatmap[] {
   const dias = diasConRegistro(registros);
   const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
 
-  const totalDias = semanas * 7;
-  const inicio = new Date(hoy);
-  inicio.setDate(inicio.getDate() - totalDias + 1);
-  inicio.setDate(inicio.getDate() - inicio.getDay());
+  const inicioAnio = new Date(hoy.getFullYear(), 0, 1);
+  inicioAnio.setDate(inicioAnio.getDate() - inicioAnio.getDay());
+
+  const finAnio = new Date(hoy.getFullYear(), 11, 31);
+  finAnio.setHours(0, 0, 0, 0);
 
   const resultado: DiaHeatmap[] = [];
-  const cursor = new Date(inicio);
+  const cursor = new Date(inicioAnio);
 
-  while (cursor <= hoy) {
+  while (cursor <= finAnio) {
     resultado.push({
       fecha: claveDia(cursor),
       completado: dias.has(claveDia(cursor)),
