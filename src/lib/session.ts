@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { adminAuth } from "@/lib/firebase-admin";
+import { getAdminAuth } from "@/lib/firebase-admin";
 
 export async function getUsuarioActual(): Promise<{ uid: string; email: string | null } | null> {
   const cookieStore = await cookies();
@@ -7,7 +7,7 @@ export async function getUsuarioActual(): Promise<{ uid: string; email: string |
   if (!sessionCookie) return null;
 
   try {
-    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
     return { uid: decoded.uid, email: decoded.email ?? null };
   } catch {
     return null;
