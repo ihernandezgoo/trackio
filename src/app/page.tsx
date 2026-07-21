@@ -1,9 +1,11 @@
 import { getRegistros } from "@/lib/actions";
 import { calcularCambio, calcularRachaActual, porcentajeDiasDelMes } from "@/lib/stats";
-import { getUsuarioActual } from "@/lib/session";
 import AnilloProgreso from "@/components/AnilloProgreso";
 import MiniAnillo from "@/components/MiniAnillo";
 import ModalRegistrarPeso from "@/components/ModalRegistrarPeso";
+import CambiarUsuario from "@/components/CambiarUsuario";
+import { getUsername } from "@/lib/usuario";
+import { Sun } from "lucide-react";
 
 function nombreDelDia() {
   const dias = [
@@ -13,10 +15,8 @@ function nombreDelDia() {
 }
 
 export default async function Home() {
-  const registros = await getRegistros();
-  const usuario = await getUsuarioActual();
+  const [registros, nombreUsuario] = await Promise.all([getRegistros(), getUsername()]);
   const ultimoPeso = registros[0]?.peso.valor ?? null;
-  const nombreUsuario = usuario?.email?.split("@")[0] ?? "usuario";
 
   const racha = calcularRachaActual(registros);
   const cambioSemanal = calcularCambio(registros, 7);
@@ -24,9 +24,12 @@ export default async function Home() {
 
   return (
     <main className="flex w-full flex-col gap-8 px-6 pt-8 pb-6">
-      <header>
-        <h1 className="text-2xl font-bold">{nombreDelDia()}</h1>
-        <p className="text-sm text-[var(--text-secondary)]">Hola, {nombreUsuario}</p>
+      <header className="flex items-center gap-3">
+        <Sun className="size-6 shrink-0 text-[var(--text-secondary)]" aria-hidden />
+        <div>
+          <h1 className="text-2xl font-bold">{nombreDelDia()}</h1>
+          <CambiarUsuario username={nombreUsuario} />
+        </div>
       </header>
 
       <div className="flex flex-col items-center gap-6">
@@ -45,6 +48,7 @@ export default async function Home() {
             etiqueta="Este mes"
             color="ambar"
           />
+
           <MiniAnillo
             porcentaje={cambioSemanal.diferencia === null ? 0 : Math.min(100, Math.abs(cambioSemanal.diferencia) * 20)}
             valorTexto={

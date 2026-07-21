@@ -1,6 +1,7 @@
 export type Registro = {
   id: string;
   usuario_id: string;
+  username: string;
   peso: {
     valor: number;
     unidad: "kg";

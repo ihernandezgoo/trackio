@@ -1,28 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { History, House, LogOut } from 'lucide-react';
+import { usePathname } from "next/navigation";
+import { History, House } from 'lucide-react';
 
 export default function Nav() {
   const pathname = usePathname();
-  const router = useRouter();
-
-  async function cerrarSesion() {
-    await signOut(auth);
-    await fetch("/api/session", { method: "DELETE" });
-    router.push("/login");
-    router.refresh();
-  }
 
   const iconClase = (activo: boolean) =>
     `flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium transition ${
       activo ? "text-[var(--brand)]" : "text-[var(--text-muted)]"
     }`;
-
-  if (pathname === "/login" || pathname === "/register") return null;
 
   return (
     <nav className="sticky bottom-0 z-20 mt-6 border-t border-[var(--border)] bg-[var(--surface)]/95 backdrop-blur">
@@ -40,10 +28,10 @@ export default function Nav() {
           <House className="h-5 w-5" />
         </Link>
 
-        <button type="button" onClick={cerrarSesion} className={iconClase(false)}>
-          <LogOut className="h-5 w-5" />
-          Salir
-        </button>
+        <Link href="/goals" className={iconClase(pathname === "/goals")}>
+          <House className="h-5 w-5" />
+          Objetivos
+        </Link>
       </div>
     </nav>
   );
