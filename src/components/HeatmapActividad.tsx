@@ -29,35 +29,35 @@ export default function HeatmapActividad({ dias }: { dias: DiaHeatmap[] }) {
   });
 
   return (
-    <div className="overflow-x-auto">
-      <div className="inline-flex flex-col gap-1">
-        <div className="flex gap-[3px] pl-6 text-xs text-[var(--text-muted)]">
+    <div className="flex w-full justify-center overflow-x-auto">
+      <div className="flex flex-col gap-1.5">
+        <div className="flex gap-1.5 pl-7 text-[11px] text-[var(--text-muted)]">
           {semanas.map((_, i) => {
             const etiqueta = etiquetasMes.find((e) => e.semanaIndex === i);
             return (
-              <div key={i} className="w-[11px] shrink-0">
+              <div key={i} className="w-[26px] shrink-0">
                 {etiqueta ? etiqueta.mes : ""}
               </div>
             );
           })}
         </div>
 
-        <div className="flex gap-[3px]">
-          <div className="flex flex-col gap-[3px] pr-1 text-xs text-[var(--text-muted)]">
+        <div className="flex gap-1.5">
+          <div className="flex w-7 shrink-0 flex-col gap-1.5 pr-1 text-[11px] text-[var(--text-muted)]">
             {DIAS_LABEL.map((label, i) => (
-              <div key={i} className="h-[11px] w-4 leading-[11px]">
+              <div key={i} className="flex h-[26px] items-center leading-none">
                 {label}
               </div>
             ))}
           </div>
 
           {semanas.map((semana, i) => (
-            <div key={i} className="flex flex-col gap-[3px]">
+            <div key={i} className="flex shrink-0 flex-col gap-1.5">
               {semana.map((dia) => (
                 <div
                   key={dia.fecha}
                   title={`${dia.fecha}${dia.completado ? " · pesado" : ""}`}
-                  className="h-[11px] w-[11px] rounded-sm"
+                  className="size-[26px] rounded-md"
                   style={{
                     background: dia.completado ? "var(--brand)" : "var(--surface-muted)",
                   }}
@@ -67,9 +67,9 @@ export default function HeatmapActividad({ dias }: { dias: DiaHeatmap[] }) {
           ))}
         </div>
 
-        <div className="flex items-center gap-1.5 pt-1 pl-6 text-xs text-[var(--text-muted)]">
-          <span className="h-[11px] w-[11px] rounded-sm" style={{ background: "var(--surface-muted)" }} />
-          <span className="h-[11px] w-[11px] rounded-sm" style={{ background: "var(--brand)" }} />
+        <div className="flex items-center gap-1.5 pt-2 pl-7 text-[11px] text-[var(--text-muted)]">
+          <span className="size-3 rounded-[4px]" style={{ background: "var(--surface-muted)" }} />
+          <span className="size-3 rounded-[4px]" style={{ background: "var(--brand)" }} />
           <span>Pesaje diario</span>
         </div>
       </div>

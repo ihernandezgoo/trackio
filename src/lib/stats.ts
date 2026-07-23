@@ -111,16 +111,18 @@ export function generarHeatmap(registros: Registro[]): DiaHeatmap[] {
   const dias = diasConRegistro(registros);
   const hoy = new Date();
 
-  const inicioAnio = new Date(hoy.getFullYear(), 0, 1);
-  inicioAnio.setDate(inicioAnio.getDate() - inicioAnio.getDay());
+  // Ventana de 3 meses: los dos anteriores más el actual.
+  const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1);
+  inicioMes.setDate(inicioMes.getDate() - inicioMes.getDay());
 
-  const finAnio = new Date(hoy.getFullYear(), 11, 31);
-  finAnio.setHours(0, 0, 0, 0);
+  const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+  finMes.setDate(finMes.getDate() + (6 - finMes.getDay()));
+  finMes.setHours(0, 0, 0, 0);
 
   const resultado: DiaHeatmap[] = [];
-  const cursor = new Date(inicioAnio);
+  const cursor = new Date(inicioMes);
 
-  while (cursor <= finAnio) {
+  while (cursor <= finMes) {
     resultado.push({
       fecha: claveDia(cursor),
       completado: dias.has(claveDia(cursor)),

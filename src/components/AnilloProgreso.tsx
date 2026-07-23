@@ -7,11 +7,11 @@ export default function AnilloProgreso({
   unidad: string;
   etiqueta: string;
 }) {
-  const radio = 90;
+  const radio = 88;
   const circunferencia = 2 * Math.PI * radio;
 
   return (
-    <div className="relative flex h-56 w-56 items-center justify-center sm:h-64 sm:w-64">
+    <div className="relative flex h-52 w-52 items-center justify-center sm:h-60 sm:w-60">
       <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90">
         <circle
           cx="100"
@@ -19,7 +19,7 @@ export default function AnilloProgreso({
           r={radio}
           fill="none"
           stroke="var(--surface-muted)"
-          strokeWidth="12"
+          strokeWidth="8"
         />
         <circle
           cx="100"
@@ -27,7 +27,7 @@ export default function AnilloProgreso({
           r={radio}
           fill="none"
           stroke="var(--brand)"
-          strokeWidth="12"
+          strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circunferencia}
           strokeDashoffset={valor === null ? circunferencia : circunferencia * 0.22}
@@ -36,14 +36,18 @@ export default function AnilloProgreso({
 
       <div className="absolute flex flex-col items-center">
         {valor === null ? (
-          <span className="text-lg font-medium text-[var(--text-muted)]">Sin registros</span>
+          <span className="text-base font-medium text-[var(--text-muted)]">Sin registros</span>
         ) : (
           <>
-            <span className="text-5xl font-bold sm:text-6xl">{valor}</span>
-            <span className="text-sm font-medium text-[var(--text-muted)]">{unidad}</span>
+            <span className="tabular text-[3.25rem] font-semibold leading-none tracking-tight sm:text-6xl">
+              {valor}
+            </span>
+            <span className="mt-1.5 text-sm font-medium text-[var(--text-muted)]">{unidad}</span>
           </>
         )}
-        <span className="mt-2 text-xs font-medium text-[var(--text-secondary)]">{etiqueta}</span>
+        <span className="mt-2 text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">
+          {etiqueta}
+        </span>
       </div>
     </div>
   );

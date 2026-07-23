@@ -16,12 +16,12 @@ export default function GraficoSemanal({ dias }: { dias: DiaResumen[] }) {
               <div
                 title={dia.peso !== null ? `${dia.peso} kg` : "Sin registro"}
                 style={{ height: `${alturaPct}%` }}
-                className={`w-2.5 rounded-full ${
+                className={`w-1.5 rounded-full transition-all ${
                   dia.peso === null ? "bg-[var(--surface-muted)]" : "bg-[var(--brand)]"
                 }`}
               />
             </div>
-            <span className="text-xs font-medium text-[var(--text-muted)]">{dia.etiqueta}</span>
+            <span className="text-[11px] font-medium text-[var(--text-muted)]">{dia.etiqueta}</span>
           </div>
         );
       })}

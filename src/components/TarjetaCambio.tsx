@@ -7,13 +7,15 @@ export default function TarjetaCambio({ titulo, cambio }: { titulo: string; camb
   const bajada = !sinDatos && diferencia < 0;
 
   return (
-    <div className="flex flex-col gap-1 rounded-2xl bg-[var(--surface)] p-4 shadow-sm ring-1 ring-[var(--border)]">
-      <span className="text-xs font-medium text-[var(--text-secondary)]">{titulo}</span>
+    <div className="flex flex-col gap-1 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+      <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">
+        {titulo}
+      </span>
       {sinDatos ? (
-        <span className="text-lg text-[var(--text-muted)]">Sin datos</span>
+        <span className="text-lg text-[var(--text-muted)]">—</span>
       ) : (
         <span
-          className="text-xl font-semibold"
+          className="tabular text-xl font-semibold tracking-tight"
           style={{ color: subida ? "var(--critical)" : bajada ? "var(--good)" : "var(--text-secondary)" }}
         >
           {diferencia > 0 ? "+" : ""}

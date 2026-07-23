@@ -22,12 +22,12 @@ export default function CambiarUsuario({ username }: { username: string }) {
 
   if (!editando) {
     return (
-      <p className="text-sm text-[var(--text-secondary)]">
+      <p className="mt-1 text-sm text-[var(--text-muted)]">
         Hola,{" "}
         <button
           type="button"
           onClick={() => setEditando(true)}
-          className="font-medium text-[var(--brand)] underline underline-offset-2 transition hover:brightness-110"
+          className="font-medium text-[var(--text-secondary)] underline decoration-[var(--border-strong)] underline-offset-4 transition hover:text-[var(--brand)]"
         >
           {username}
         </button>
@@ -36,7 +36,7 @@ export default function CambiarUsuario({ username }: { username: string }) {
   }
 
   return (
-    <form ref={formRef} onSubmit={guardar} className="mt-1 flex items-center gap-2">
+    <form ref={formRef} onSubmit={guardar} className="mt-1.5 flex items-center gap-1.5">
       <input
         type="text"
         name="username"
@@ -47,12 +47,12 @@ export default function CambiarUsuario({ username }: { username: string }) {
         onKeyDown={(e) => {
           if (e.key === "Escape") setEditando(false);
         }}
-        className="w-36 rounded-lg border border-[var(--border)] bg-transparent px-2 py-1 text-sm outline-none focus:border-[var(--brand)]"
+        className="w-32 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 text-sm outline-none transition focus:border-[var(--brand)]"
       />
       <button
         type="submit"
         disabled={guardando}
-        className="rounded-full bg-[var(--brand)] px-3 py-1 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-50"
+        className="rounded-lg bg-[var(--brand)] px-3 py-1.5 text-sm font-medium text-[var(--brand-contrast)] transition hover:brightness-110 disabled:opacity-50"
       >
         {guardando ? "…" : "Guardar"}
       </button>
@@ -60,7 +60,7 @@ export default function CambiarUsuario({ username }: { username: string }) {
         type="button"
         onClick={() => setEditando(false)}
         disabled={guardando}
-        className="rounded-full px-2 py-1 text-sm text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] disabled:opacity-50"
+        className="rounded-lg px-2 py-1.5 text-sm text-[var(--text-muted)] transition hover:bg-[var(--surface-muted)] disabled:opacity-50"
       >
         Cancelar
       </button>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Nav from "@/components/Nav";
+import Shell from "@/components/Shell";
+import ScriptTema from "@/components/ScriptTema";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,7 +22,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: "#4a3aa7",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f8fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#14181f" },
+  ],
 };
 
 export default function RootLayout({
@@ -32,12 +37,16 @@ export default function RootLayout({
     <html
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex justify-center bg-[var(--background)] text-[var(--foreground)] sm:py-8">
-        <div className="flex min-h-full w-full max-w-md flex-col bg-[var(--background)] sm:min-h-[844px] sm:rounded-[2.5rem] sm:shadow-2xl sm:shadow-black/10 sm:ring-1 sm:ring-[var(--border)]">
+      <head>
+        <ScriptTema />
+      </head>
+      <body className="min-h-full flex justify-center bg-[var(--background)] text-[var(--foreground)] sm:py-10">
+        <Shell>
           <div className="flex-1">{children}</div>
           <Nav />
-        </div>
+        </Shell>
       </body>
     </html>
   );

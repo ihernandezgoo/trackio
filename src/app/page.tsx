@@ -4,8 +4,8 @@ import AnilloProgreso from "@/components/AnilloProgreso";
 import MiniAnillo from "@/components/MiniAnillo";
 import ModalRegistrarPeso from "@/components/ModalRegistrarPeso";
 import CambiarUsuario from "@/components/CambiarUsuario";
+import BotonTema from "@/components/BotonTema";
 import { getUsername } from "@/lib/usuario";
-import { Sun } from "lucide-react";
 
 function nombreDelDia() {
   const dias = [
@@ -23,23 +23,28 @@ export default async function Home() {
   const porcentajeMes = porcentajeDiasDelMes(registros);
 
   return (
-    <main className="flex w-full flex-col gap-8 px-6 pt-8 pb-6">
-      <header className="flex items-center gap-3">
-        <Sun className="size-6 shrink-0 text-[var(--text-secondary)]" aria-hidden />
+    <main className="flex w-full flex-col gap-8 px-5 pt-8 pb-6">
+      <header className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{nombreDelDia()}</h1>
+          <p className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">
+            {nombreDelDia()}
+          </p>
+          <h1 className="mt-1 text-[1.75rem] font-semibold leading-tight tracking-tight">
+            Tu peso
+          </h1>
           <CambiarUsuario username={nombreUsuario} />
         </div>
+        <BotonTema />
       </header>
 
       <div className="flex flex-col items-center gap-6">
         <AnilloProgreso valor={ultimoPeso} unidad="kg" etiqueta="Último peso" />
 
-        <div className="flex gap-6">
+        <div className="flex w-full gap-2.5">
           <MiniAnillo
             porcentaje={Math.min(100, racha * 10)}
             valorTexto={`${racha}`}
-            etiqueta="Racha (días)"
+            etiqueta="Racha"
             color="verde"
           />
           <MiniAnillo
@@ -48,7 +53,6 @@ export default async function Home() {
             etiqueta="Este mes"
             color="ambar"
           />
-
           <MiniAnillo
             porcentaje={cambioSemanal.diferencia === null ? 0 : Math.min(100, Math.abs(cambioSemanal.diferencia) * 20)}
             valorTexto={

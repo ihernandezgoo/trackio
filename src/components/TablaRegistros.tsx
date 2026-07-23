@@ -5,7 +5,6 @@ function formatearFecha(iso: string) {
   return new Date(iso).toLocaleString("es-ES", {
     day: "2-digit",
     month: "short",
-    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -14,65 +13,50 @@ function formatearFecha(iso: string) {
 export default function TablaRegistros({ registros }: { registros: Registro[] }) {
   if (registros.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-[var(--border)] p-6 text-center text-[var(--text-secondary)]">
+      <p className="rounded-2xl border border-dashed border-[var(--border-strong)] p-8 text-center text-sm text-[var(--text-muted)]">
         Todavía no hay registros.
       </p>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl bg-[var(--surface)] ring-1 ring-[var(--border)]">
-      <table className="w-full min-w-[480px] text-left text-sm">
-        <thead className="bg-[var(--surface-muted)] text-xs uppercase text-[var(--text-secondary)]">
-          <tr>
-            <th className="px-4 py-3 font-medium">Fecha</th>
-            <th className="px-4 py-3 font-medium">Peso</th>
-            <th className="px-4 py-3 font-medium">Variación</th>
-            <th className="px-4 py-3 font-medium">Nota</th>
-            <th className="px-4 py-3" />
-          </tr>
-        </thead>
-        <tbody>
-          {registros.map((registro, i) => {
-            const anterior = registros[i + 1];
-            const variacion = anterior
-              ? Number((registro.peso.valor - anterior.peso.valor).toFixed(1))
-              : null;
+    <ul className="flex flex-col gap-1.5">
+      {registros.map((registro, i) => {
+        const anterior = registros[i + 1];
+        const variacion = anterior
+          ? Number((registro.peso.valor - anterior.peso.valor).toFixed(1))
+          : null;
 
-            return (
-              <tr key={registro.id} className="border-t border-[var(--border)]">
-                <td className="px-4 py-3 whitespace-nowrap text-[var(--text-secondary)]">
-                  {formatearFecha(registro.fecha_hora)}
-                </td>
-                <td className="px-4 py-3 font-semibold">{registro.peso.valor} kg</td>
-                <td className="px-4 py-3">
-                  {variacion === null ? (
-                    <span className="text-[var(--text-muted)]">—</span>
-                  ) : (
-                    <span
-                      style={{
-                        color:
-                          variacion > 0
-                            ? "var(--critical)"
-                            : variacion < 0
-                              ? "var(--good)"
-                              : "var(--text-secondary)",
-                      }}
-                    >
-                      {variacion > 0 ? "+" : ""}
-                      {variacion} kg
-                    </span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-[var(--text-secondary)]">{registro.nota || "—"}</td>
-                <td className="px-4 py-3 text-right">
-                  <BotonBorrar id={registro.id} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+        return (
+          <li
+            key={registro.id}
+            className="group flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 transition hover:border-[var(--border-strong)]"
+          >
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline gap-2">
+                <span className="tabular text-lg font-semibold tracking-tight">
+                  {registro.peso.valor} kg
+                </span>
+                {variacion !== null && variacion !== 0 && (
+                  <span
+                    className="tabular text-xs font-medium"
+                    style={{ color: variacion > 0 ? "var(--critical)" : "var(--good)" }}
+                  >
+                    {variacion > 0 ? "+" : ""}
+                    {variacion}
+                  </span>
+                )}
+              </div>
+              <p className="mt-0.5 truncate text-xs text-[var(--text-muted)]">
+                {formatearFecha(registro.fecha_hora)}
+                {registro.nota ? ` · ${registro.nota}` : ""}
+              </p>
+            </div>
+
+            <BotonBorrar id={registro.id} />
+          </li>
+        );
+      })}
+    </ul>
   );
 }

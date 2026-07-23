@@ -1,52 +1,132 @@
 @import "tailwindcss";
 
+/*
+ * Temas. Orden importante:
+ * 1. :root -> valores claros (base)
+ * 2. media query -> oscuro solo si el usuario NO ha elegido tema
+ * 3. [data-theme="..."] -> elección explícita, gana sobre todo lo anterior
+ *
+ * Paleta tomada del logo: azul #1061ed y tinta #333944.
+ */
 :root {
-  --background: #f7f5fc;
-  --foreground: #1c1730;
+  --background: #f7f8fa;
+  --foreground: #333944;
   --surface: #ffffff;
-  --surface-muted: #efeaf9;
-  --border: rgba(28, 23, 48, 0.08);
-  --brand: #4a3aa7;
-  --brand-soft: #ece8fb;
-  --ring-2: #1baf7a;
-  --ring-3: #eda100;
-  --ring-4: #2a78d6;
-  --good: #0ca30c;
-  --critical: #d03b3b;
-  --text-secondary: #6b6680;
-  --text-muted: #9a95ac;
+  --surface-muted: #eef1f5;
+  --border: rgba(51, 57, 68, 0.09);
+  --border-strong: rgba(51, 57, 68, 0.16);
+  --brand: #1061ed;
+  --brand-soft: #e6effd;
+  --brand-contrast: #ffffff;
+  --ring-2: #0f9d76;
+  --ring-3: #d38b00;
+  --ring-4: #1061ed;
+  --good: #0f9d76;
+  --critical: #dc4a4a;
+  --text-secondary: #5c6472;
+  --text-muted: #8b93a1;
+  --shadow-soft: 0 1px 2px rgba(51, 57, 68, 0.05), 0 8px 24px rgba(51, 57, 68, 0.07);
+  --shadow-lift: 0 2px 4px rgba(51, 57, 68, 0.07), 0 16px 40px rgba(51, 57, 68, 0.12);
+}
+
+/* Oscuro automático: solo cuando no hay elección explícita del usuario. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --background: #14181f;
+    --foreground: #eef1f5;
+    --surface: #1c212a;
+    --surface-muted: #262c37;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --brand: #4d90ff;
+    --brand-soft: #16294a;
+    --brand-contrast: #0b0f15;
+    --ring-2: #2bbb8f;
+    --ring-3: #e0a417;
+    --ring-4: #4d90ff;
+    --good: #2bbb8f;
+    --critical: #ef6b6b;
+    --text-secondary: #9aa4b4;
+    --text-muted: #6b7482;
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* Claro forzado: gana sobre la preferencia del sistema. */
+:root[data-theme="light"] {
+  --background: #f7f8fa;
+  --foreground: #333944;
+  --surface: #ffffff;
+  --surface-muted: #eef1f5;
+  --border: rgba(51, 57, 68, 0.09);
+  --border-strong: rgba(51, 57, 68, 0.16);
+  --brand: #1061ed;
+  --brand-soft: #e6effd;
+  --brand-contrast: #ffffff;
+  --ring-2: #0f9d76;
+  --ring-3: #d38b00;
+  --ring-4: #1061ed;
+  --good: #0f9d76;
+  --critical: #dc4a4a;
+  --text-secondary: #5c6472;
+  --text-muted: #8b93a1;
+  --shadow-soft: 0 1px 2px rgba(51, 57, 68, 0.05), 0 8px 24px rgba(51, 57, 68, 0.07);
+  --shadow-lift: 0 2px 4px rgba(51, 57, 68, 0.07), 0 16px 40px rgba(51, 57, 68, 0.12);
+}
+
+/* Oscuro forzado: gana aunque el sistema esté en claro. */
+:root[data-theme="dark"] {
+  --background: #14181f;
+  --foreground: #eef1f5;
+  --surface: #1c212a;
+  --surface-muted: #262c37;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --brand: #4d90ff;
+  --brand-soft: #16294a;
+  --brand-contrast: #0b0f15;
+  --ring-2: #2bbb8f;
+  --ring-3: #e0a417;
+  --ring-4: #4d90ff;
+  --good: #2bbb8f;
+  --critical: #ef6b6b;
+  --text-secondary: #9aa4b4;
+  --text-muted: #6b7482;
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-border-subtle: var(--border);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #14121f;
-    --foreground: #f3f1fa;
-    --surface: #1e1b2e;
-    --surface-muted: #292440;
-    --border: rgba(255, 255, 255, 0.08);
-    --brand: #9085e9;
-    --brand-soft: #2b2650;
-    --ring-2: #199e70;
-    --ring-3: #c98500;
-    --ring-4: #3987e5;
-    --good: #0ca30c;
-    --critical: #e66767;
-    --text-secondary: #b6b1c9;
-    --text-muted: #7f7a95;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Transición suave al cambiar de tema, sin afectar a transform/opacity de la UI */
+:root[data-theme-ready] body,
+:root[data-theme-ready] body * {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Números tabulares para que los pesos no bailen al actualizarse */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 input[type="number"]::-webkit-outer-spin-button,
@@ -58,4 +138,13 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

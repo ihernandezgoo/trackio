@@ -14,20 +14,36 @@ export default function TabsHistorial({
   const [tab, setTab] = useState<Tab>("historial");
 
   const claseTab = (activo: boolean) =>
-    `flex-1 rounded-xl py-2 text-sm font-medium transition ${
+    `flex-1 rounded-lg py-2 text-sm font-medium transition ${
       activo
-        ? "bg-[var(--brand)] text-white"
-        : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+        ? "bg-[var(--surface)] text-[var(--foreground)] shadow-[var(--shadow-soft)]"
+        : "text-[var(--text-muted)] hover:text-[var(--foreground)]"
     }`;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-1.5 rounded-xl bg-[var(--surface-muted)] p-1">
-        <button type="button" onClick={() => setTab("historial")} className={claseTab(tab === "historial")}>
-          Historial
+    <div className="flex flex-col gap-5">
+      <div
+        role="tablist"
+        aria-label="Vistas del historial"
+        className="flex gap-1 rounded-xl bg-[var(--surface-muted)] p-1"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "historial"}
+          onClick={() => setTab("historial")}
+          className={claseTab(tab === "historial")}
+        >
+          Resumen
         </button>
-        <button type="button" onClick={() => setTab("filtros")} className={claseTab(tab === "filtros")}>
-          Filtros
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "filtros"}
+          onClick={() => setTab("filtros")}
+          className={claseTab(tab === "filtros")}
+        >
+          Registros
         </button>
       </div>
 

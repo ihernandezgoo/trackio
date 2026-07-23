@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
 import type { Registro } from "@/lib/registros";
 import TablaRegistros from "@/components/TablaRegistros";
 
@@ -20,6 +21,13 @@ const MOMENTOS: { valor: MomentoDia; etiqueta: string }[] = [
   { valor: "tarde", etiqueta: "Tarde" },
   { valor: "noche", etiqueta: "Noche" },
 ];
+
+const claseChip = (activo: boolean) =>
+  `rounded-full px-3 py-1.5 text-xs font-medium transition ${
+    activo
+      ? "bg-[var(--brand)] text-[var(--brand-contrast)]"
+      : "border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+  }`;
 
 export default function FiltrosHistorial({ registros }: { registros: Registro[] }) {
   const [rango, setRango] = useState<RangoFecha>("todo");
@@ -49,19 +57,15 @@ export default function FiltrosHistorial({ registros }: { registros: Registro[] 
   }, [registros, rango, momento, busqueda]);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <div className="flex flex-wrap gap-1.5">
           {RANGOS.map(({ valor, etiqueta }) => (
             <button
               key={valor}
               type="button"
               onClick={() => setRango(valor)}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                rango === valor
-                  ? "bg-[var(--brand)] text-white"
-                  : "bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:brightness-95"
-              }`}
+              className={claseChip(rango === valor)}
             >
               {etiqueta}
             </button>
@@ -74,11 +78,7 @@ export default function FiltrosHistorial({ registros }: { registros: Registro[] 
               key={valor}
               type="button"
               onClick={() => setMomento(valor)}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                momento === valor
-                  ? "bg-[var(--brand)] text-white"
-                  : "bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:brightness-95"
-              }`}
+              className={claseChip(momento === valor)}
             >
               {etiqueta}
             </button>
@@ -86,16 +86,22 @@ export default function FiltrosHistorial({ registros }: { registros: Registro[] 
         </div>
       </div>
 
-      <input
-        type="text"
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        placeholder="Buscar por nota..."
-        className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)]"
-      />
+      <div className="relative">
+        <Search
+          className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--text-muted)]"
+          aria-hidden
+        />
+        <input
+          type="text"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar por nota…"
+          className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] py-2.5 pl-10 pr-3.5 text-sm outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--brand)]"
+        />
+      </div>
 
       {registrosFiltrados.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[var(--border)] p-6 text-center text-[var(--text-secondary)]">
+        <p className="rounded-2xl border border-dashed border-[var(--border-strong)] p-8 text-center text-sm text-[var(--text-muted)]">
           No hay registros que coincidan con los filtros.
         </p>
       ) : (
