@@ -1,0 +1,22 @@
+{
+  "_comentario": "Forma de los datos en Realtime Database. Los registros cuelgan del uid de Firebase Auth, que es lo que hace cumplibles las reglas de database.rules.json.",
+  "registros_peso": {
+    "<uid de Firebase Auth>": {
+      "<id generado por push()>": {
+        "peso": {
+          "valor": 78.5,
+          "unidad": "kg"
+        },
+        "fecha_hora": "2026-07-15T08:30:00.000Z",
+        "nota": "opcional, máx. 280 caracteres (ej: 'después de correr')",
+        "condicion": {
+          "en_ayunas": true,
+          "momento_dia": "mañana | tarde | noche"
+        },
+        "dispositivo": "manual",
+        "creado_en": "2026-07-15T08:30:05.000Z",
+        "actualizado_en": "2026-07-15T08:30:05.000Z"
+      }
+    }
+  }
+}

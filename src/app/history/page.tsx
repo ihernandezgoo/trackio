@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import { getRegistros } from "@/lib/actions";
 import { calcularCambio, ultimos7Dias } from "@/lib/stats";
 import TarjetaCambio from "@/components/TarjetaCambio";
 import FiltrosHistorial from "@/components/FiltrosHistorial";
 import GraficoSemanal from "@/components/GraficoSemanal";
 import TabsHistorial from "@/components/TabsHistorial";
+
+export const metadata: Metadata = {
+  title: "Historial · Trackio",
+};
+
+export const dynamic = "force-dynamic";
 
 export default async function HistoryPage() {
   const registros = await getRegistros();

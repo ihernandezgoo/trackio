@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { getRegistros } from "@/lib/actions";
 import { calcularRachaActual, diasConRegistro, generarHeatmap, diaClaveHoy } from "@/lib/stats";
 import HeatmapActividad from "@/components/HeatmapActividad";
 import { Check, Flame } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Objetivos · Trackio",
+};
+
+export const dynamic = "force-dynamic";
 
 export default async function GoalsPage() {
   const registros = await getRegistros();

@@ -1,7 +1,11 @@
+export const PESO_MINIMO = 20;
+export const PESO_MAXIMO = 500;
+export const NOTA_MAX_LONGITUD = 280;
+
+export type MomentoDia = "mañana" | "tarde" | "noche";
+
 export type Registro = {
   id: string;
-  usuario_id: string;
-  username: string;
   peso: {
     valor: number;
     unidad: "kg";
@@ -10,9 +14,12 @@ export type Registro = {
   nota?: string;
   condicion: {
     en_ayunas: boolean;
-    momento_dia: "mañana" | "tarde" | "noche";
+    momento_dia: MomentoDia;
   };
   dispositivo: "manual";
   creado_en: string;
   actualizado_en: string;
 };
+
+/** Resultado de una Server Action: el error viaja como estado, no como excepción. */
+export type EstadoAccion = { ok: boolean; error?: string };

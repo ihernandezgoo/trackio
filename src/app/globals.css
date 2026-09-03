@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 /*
- * Temas. Orden importante:
- * 1. :root -> valores claros (base)
- * 2. media query -> oscuro solo si el usuario NO ha elegido tema
- * 3. [data-theme="..."] -> elección explícita, gana sobre todo lo anterior
+ * Temas. Cada paleta se define una sola vez y se aplica a los selectores que
+ * la necesitan:
+ * 1. :root y [data-theme="light"] -> claro (base y elección explícita)
+ * 2. media query sin [data-theme]  -> oscuro automático del sistema
+ * 3. [data-theme="dark"]           -> oscuro forzado, gana sobre el sistema
  *
  * Paleta tomada del logo: azul #1061ed y tinta #333944.
  */
-:root {
+:root,
+:root[data-theme="light"] {
   --background: #f7f8fa;
   --foreground: #333944;
   --surface: #ffffff;
@@ -29,7 +31,6 @@
   --shadow-lift: 0 2px 4px rgba(51, 57, 68, 0.07), 0 16px 40px rgba(51, 57, 68, 0.12);
 }
 
-/* Oscuro automático: solo cuando no hay elección explícita del usuario. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --background: #14181f;
@@ -53,29 +54,6 @@
   }
 }
 
-/* Claro forzado: gana sobre la preferencia del sistema. */
-:root[data-theme="light"] {
-  --background: #f7f8fa;
-  --foreground: #333944;
-  --surface: #ffffff;
-  --surface-muted: #eef1f5;
-  --border: rgba(51, 57, 68, 0.09);
-  --border-strong: rgba(51, 57, 68, 0.16);
-  --brand: #1061ed;
-  --brand-soft: #e6effd;
-  --brand-contrast: #ffffff;
-  --ring-2: #0f9d76;
-  --ring-3: #d38b00;
-  --ring-4: #1061ed;
-  --good: #0f9d76;
-  --critical: #dc4a4a;
-  --text-secondary: #5c6472;
-  --text-muted: #8b93a1;
-  --shadow-soft: 0 1px 2px rgba(51, 57, 68, 0.05), 0 8px 24px rgba(51, 57, 68, 0.07);
-  --shadow-lift: 0 2px 4px rgba(51, 57, 68, 0.07), 0 16px 40px rgba(51, 57, 68, 0.12);
-}
-
-/* Oscuro forzado: gana aunque el sistema esté en claro. */
 :root[data-theme="dark"] {
   --background: #14181f;
   --foreground: #eef1f5;

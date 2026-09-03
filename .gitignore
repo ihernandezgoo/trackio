@@ -30,8 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files: nunca subir credenciales, pero sí la plantilla
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -42,5 +43,10 @@ next-env.d.ts
 
 .claude
 .agents
-firebase.json
-.firebaserc
+
+# logs locales
+dev.log
+*.log
+
+# copias de seguridad de la base de datos
+/backups

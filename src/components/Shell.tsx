@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Nav from "@/components/Nav";
 
 /** Rutas que necesitan un contenedor ancho en escritorio. */
 const RUTAS_ANCHAS = ["/goals"];
@@ -15,7 +16,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         ancho ? "max-w-3xl" : "max-w-md"
       }`}
     >
-      {children}
+      <div className="flex flex-1 flex-col">{children}</div>
+      <Nav />
     </div>
   );
 }

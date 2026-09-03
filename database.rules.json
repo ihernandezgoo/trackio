@@ -1,0 +1,21 @@
+{
+  /*
+   * Trackio accede a los datos solo desde el servidor, con credenciales de
+   * administrador, que se saltan estas reglas. Ningún cliente lee ni escribe
+   * directamente, así que todo queda cerrado: esto es lo que impide que la
+   * base de datos sea pública.
+   *
+   * La validación de los datos (rango de peso, longitud de la nota) vive en
+   * src/lib/actions.ts, que es el único camino de escritura.
+   */
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "registros_peso": {
+      "$uid": {
+        ".indexOn": ["fecha_hora"]
+      }
+    }
+  }
+}

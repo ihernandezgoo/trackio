@@ -53,7 +53,10 @@ export default function TablaRegistros({ registros }: { registros: Registro[] })
               </p>
             </div>
 
-            <BotonBorrar id={registro.id} />
+            <BotonBorrar
+              id={registro.id}
+              etiqueta={`${registro.peso.valor} kg · ${formatearFecha(registro.fecha_hora)}`}
+            />
           </li>
         );
       })}

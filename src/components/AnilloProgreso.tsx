@@ -2,17 +2,21 @@ export default function AnilloProgreso({
   valor,
   unidad,
   etiqueta,
+  progreso,
 }: {
   valor: number | null;
   unidad: string;
   etiqueta: string;
+  /** 0–100. Si es null el anillo queda vacío (no hay nada que medir todavía). */
+  progreso: number | null;
 }) {
   const radio = 88;
   const circunferencia = 2 * Math.PI * radio;
+  const relleno = progreso === null ? 0 : Math.max(0, Math.min(100, progreso));
 
   return (
     <div className="relative flex h-52 w-52 items-center justify-center sm:h-60 sm:w-60">
-      <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90">
+      <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90" aria-hidden>
         <circle
           cx="100"
           cy="100"
@@ -30,7 +34,7 @@ export default function AnilloProgreso({
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circunferencia}
-          strokeDashoffset={valor === null ? circunferencia : circunferencia * 0.22}
+          strokeDashoffset={circunferencia * (1 - relleno / 100)}
         />
       </svg>
 

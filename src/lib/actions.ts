@@ -1,110 +1,104 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
-import { ref, push, set, remove, get } from "firebase/database";
-import { db } from "@/lib/firebase";
-import type { Registro } from "@/lib/registros";
+import { getAdminDb } from "@/lib/firebase-admin";
+import { getUsuario } from "@/lib/session";
 import {
-  USERNAME_COOKIE,
-  USERNAME_POR_DEFECTO,
-  getUsername,
-  normalizarUsername,
-} from "@/lib/usuario";
+  NOTA_MAX_LONGITUD,
+  PESO_MAXIMO,
+  PESO_MINIMO,
+  type EstadoAccion,
+  type MomentoDia,
+  type Registro,
+} from "@/lib/registros";
 
-const USUARIO_ID = "temporal";
-
-export async function getRegistros(): Promise<Registro[]> {
-  const username = await getUsername();
-  const snapshot = await get(ref(db, "registros_peso"));
-
-  if (!snapshot.exists()) return [];
-
-  const registros: Registro[] = [];
-  snapshot.forEach((child) => {
-    const val = child.val();
-    const registro: Registro = {
-      ...val,
-      id: child.key as string,
-      usuario_id: val.usuario_id ?? USUARIO_ID,
-      username: val.username ?? USERNAME_POR_DEFECTO,
-    };
-    if (registro.username === username) registros.push(registro);
-  });
-
-  return registros.sort((a, b) => b.fecha_hora.localeCompare(a.fecha_hora));
-}
-
-export async function cambiarUsername(formData: FormData) {
-  const username = normalizarUsername(String(formData.get("username") ?? ""));
-
-  if (!username) {
-    throw new Error("El nombre de usuario no puede estar vacío");
-  }
-
-  const store = await cookies();
-  store.set(USERNAME_COOKIE, username, {
-    path: "/",
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: "lax",
-  });
-
+/** Las tres vistas dependen de los mismos datos. */
+function revalidarVistas() {
   revalidatePath("/");
   revalidatePath("/history");
   revalidatePath("/goals");
 }
 
-function momentoDelDiaActual(): "mañana" | "tarde" | "noche" {
+/**
+ * Todas las rutas cuelgan del uid del propietario. El SDK de administrador se
+ * salta las reglas de seguridad, así que acotar por uid aquí no es opcional.
+ */
+function registrosRef() {
+  const { uid } = getUsuario();
+  return getAdminDb().ref(`registros_peso/${uid}`);
+}
+
+export async function getRegistros(): Promise<Registro[]> {
+  const snapshot = await registrosRef().orderByChild("fecha_hora").get();
+
+  if (!snapshot.exists()) return [];
+
+  const registros: Registro[] = [];
+  snapshot.forEach((child) => {
+    registros.push({ ...child.val(), id: child.key as string });
+  });
+
+  // orderByChild devuelve ascendente; la UI espera el más reciente primero.
+  return registros.reverse();
+}
+
+function momentoDelDiaActual(): MomentoDia {
   const hora = new Date().getHours();
   if (hora < 12) return "mañana";
   if (hora < 20) return "tarde";
   return "noche";
 }
 
-export async function crearRegistroRapido(formData: FormData) {
-  const pesoTexto = String(formData.get("peso") ?? "").replace(",", ".");
+export async function crearRegistroRapido(
+  _estadoPrevio: EstadoAccion,
+  formData: FormData,
+): Promise<EstadoAccion> {
+  const pesoTexto = String(formData.get("peso") ?? "").trim().replace(",", ".");
   const valor = Number(pesoTexto);
-  const nota = String(formData.get("nota") ?? "").trim();
 
-  if (!valor || valor <= 0) {
-    throw new Error("El peso debe ser un número mayor que 0");
+  if (!pesoTexto || !Number.isFinite(valor)) {
+    return { ok: false, error: "Escribe un peso válido." };
+  }
+  if (valor < PESO_MINIMO || valor > PESO_MAXIMO) {
+    return { ok: false, error: `El peso debe estar entre ${PESO_MINIMO} y ${PESO_MAXIMO} kg.` };
   }
 
-  const username = await getUsername();
+  const nota = String(formData.get("nota") ?? "").trim().slice(0, NOTA_MAX_LONGITUD);
   const now = new Date().toISOString();
-  const nuevoRef = push(ref(db, "registros_peso"));
 
-  await set(nuevoRef, {
-    usuario_id: USUARIO_ID,
-    username,
-    peso: { valor, unidad: "kg" },
-    fecha_hora: now,
-    nota: nota || null,
-    condicion: { en_ayunas: false, momento_dia: momentoDelDiaActual() },
-    dispositivo: "manual",
-    creado_en: now,
-    actualizado_en: now,
-  });
+  // Un decimal es la precisión real de una báscula doméstica.
+  const pesoRedondeado = Math.round(valor * 10) / 10;
 
-  revalidatePath("/");
-  revalidatePath("/history");
-  revalidatePath("/goals");
+  try {
+    await registrosRef().push().set({
+      peso: { valor: pesoRedondeado, unidad: "kg" },
+      fecha_hora: now,
+      ...(nota ? { nota } : {}),
+      condicion: { en_ayunas: false, momento_dia: momentoDelDiaActual() },
+      dispositivo: "manual",
+      creado_en: now,
+      actualizado_en: now,
+    });
+  } catch {
+    return { ok: false, error: "No se pudo guardar. Inténtalo de nuevo." };
+  }
+
+  revalidarVistas();
+  return { ok: true };
 }
 
-export async function borrarRegistro(id: string) {
-  const username = await getUsername();
-  const registroRef = ref(db, `registros_peso/${id}`);
-  const snapshot = await get(registroRef);
-
-  if (!snapshot.exists()) return;
-
-  const dueño = snapshot.val()?.username ?? USERNAME_POR_DEFECTO;
-  if (dueño !== username) {
-    throw new Error("No puedes borrar un registro de otro usuario");
+export async function borrarRegistro(id: string): Promise<EstadoAccion> {
+  // Un id con "/" o ".." podría escapar de la rama del usuario.
+  if (!id || !/^[A-Za-z0-9_-]+$/.test(id)) {
+    return { ok: false, error: "Registro no válido." };
   }
 
-  await remove(registroRef);
-  revalidatePath("/");
-  revalidatePath("/history");
-  revalidatePath("/goals");
+  try {
+    await registrosRef().child(id).remove();
+  } catch {
+    return { ok: false, error: "No se pudo borrar. Inténtalo de nuevo." };
+  }
+
+  revalidarVistas();
+  return { ok: true };
 }

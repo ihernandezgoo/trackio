@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Nav from "@/components/Nav";
 import Shell from "@/components/Shell";
 import ScriptTema from "@/components/ScriptTema";
 import "./globals.css";
@@ -43,10 +42,7 @@ export default function RootLayout({
         <ScriptTema />
       </head>
       <body className="min-h-full flex justify-center bg-[var(--background)] text-[var(--foreground)] sm:py-10">
-        <Shell>
-          <div className="flex-1">{children}</div>
-          <Nav />
-        </Shell>
+        <Shell>{children}</Shell>
       </body>
     </html>
   );
