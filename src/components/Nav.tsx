@@ -14,7 +14,7 @@ export default function Nav() {
 
   return (
     <nav className="sticky bottom-0 z-20 mt-8 border-t border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-xl">
-      <div className="relative mx-auto flex w-full max-w-md items-center justify-center px-6 pb-[env(safe-area-inset-bottom)]">
+      <div className="relative mx-auto flex w-full max-w-md items-center justify-center px-4 pb-[env(safe-area-inset-bottom)] sm:px-6">
         {ENLACES.map(({ href, icono: Icono, etiqueta }, i) => {
           const activo = pathname === href;
           return (
@@ -22,8 +22,8 @@ export default function Nav() {
               key={href}
               href={href}
               aria-current={activo ? "page" : undefined}
-              className={`group flex flex-1 flex-col items-center gap-1 py-3 text-[11px] font-medium transition-colors ${
-                i === 0 ? "pr-10" : "pl-10"
+              className={`group flex min-w-0 flex-1 flex-col items-center gap-1 py-3 text-[11px] font-medium transition-colors ${
+                i === 0 ? "pr-8 sm:pr-10" : "pl-8 sm:pl-10"
               } ${activo ? "text-[var(--brand)]" : "text-[var(--text-muted)] hover:text-[var(--foreground)]"}`}
             >
               <Icono

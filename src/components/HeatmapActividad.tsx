@@ -29,8 +29,8 @@ export default function HeatmapActividad({ dias }: { dias: DiaHeatmap[] }) {
   });
 
   return (
-    <div className="flex w-full justify-center overflow-x-auto">
-      <div className="flex flex-col gap-1.5">
+    <div className="-mx-1 flex w-[calc(100%+0.5rem)] justify-start overflow-x-auto px-1 pb-1 sm:justify-center">
+      <div className="flex min-w-max flex-col gap-1.5">
         <div className="flex gap-1.5 pl-7 text-[11px] text-[var(--text-muted)]">
           {semanas.map((_, i) => {
             const etiqueta = etiquetasMes.find((e) => e.semanaIndex === i);

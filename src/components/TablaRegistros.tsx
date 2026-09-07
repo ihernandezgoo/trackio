@@ -30,7 +30,7 @@ export default function TablaRegistros({ registros }: { registros: Registro[] })
         return (
           <li
             key={registro.id}
-            className="group flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3 transition hover:border-[var(--border-strong)]"
+            className="group flex min-w-0 items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-3 transition hover:border-[var(--border-strong)] sm:gap-3 sm:px-4"
           >
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">
