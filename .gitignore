@@ -50,3 +50,6 @@ dev.log
 
 # copias de seguridad de la base de datos
 /backups
+
+.vercel
+.env*

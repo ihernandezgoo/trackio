@@ -1,7 +1,9 @@
 import "server-only";
 
+// Ojo: no importes "firebase-admin/auth" aquí. Arrastra jwks-rsa, que hace
+// require() de jose (ESM puro) y revienta en el runtime de Vercel con
+// ERR_REQUIRE_ESM. Trackio no tiene login, así que no hace ninguna falta.
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
-import { getAuth, type Auth } from "firebase-admin/auth";
 import { getDatabase, type Database } from "firebase-admin/database";
 
 function parsePrivateKey(raw: string | undefined): string | undefined {
@@ -61,21 +63,13 @@ function getAdminApp(): App {
   });
 }
 
-let cachedAuth: Auth | null = null;
 let cachedDb: Database | null = null;
-
-export function getAdminAuth(): Auth {
-  if (!cachedAuth) {
-    cachedAuth = getAuth(getAdminApp());
-  }
-  return cachedAuth;
-}
 
 /**
  * Base de datos con credenciales de administrador: se salta las reglas de
- * seguridad, así que TODA consulta debe acotarse al uid del usuario ya
- * verificado (ver requireUsuario en session.ts). Las reglas siguen siendo la
- * red de seguridad frente al cliente, no frente a este código.
+ * seguridad, así que TODA consulta debe acotarse al uid del propietario (ver
+ * getUsuario en session.ts). Las reglas siguen siendo la red de seguridad
+ * frente al cliente, no frente a este código.
  */
 export function getAdminDb(): Database {
   if (!cachedDb) {
