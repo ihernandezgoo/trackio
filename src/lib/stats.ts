@@ -1,4 +1,4 @@
-import type { Registro } from "@/lib/registros";
+import type { Meta, Registro } from "@/lib/registros";
 
 export type Cambio = {
   actual: number | null;
@@ -149,6 +149,116 @@ export function porcentajeDiasDelMes(registros: Registro[]): number {
   }
 
   return Math.round((diasDelMes.size / diaDelMes) * 100);
+}
+
+export type ProgresoMeta = {
+  actual: number;
+  objetivo: number;
+  pesoInicial: number;
+  /** Kilos que faltan (siempre positivo). 0 si ya se alcanzó. */
+  restante: number;
+  /** 0-100, acotado: el avance recorrido desde el peso inicial hacia la meta. */
+  porcentaje: number;
+  alcanzada: boolean;
+  /** Si la meta es bajar de peso. Determina el signo del ritmo "bueno". */
+  bajando: boolean;
+  /** Kg por semana según la tendencia reciente. Negativo = bajando. */
+  ritmoSemanal: number | null;
+  /** Semanas estimadas al ritmo actual, si este acerca a la meta. */
+  semanasEstimadas: number | null;
+};
+
+/**
+ * Ritmo de cambio en kg/semana ajustando una recta por mínimos cuadrados a los
+ * pesajes de los últimos `dias`. Una regresión aguanta el ruido diario (agua,
+ * comida) mucho mejor que restar el primer y el último pesaje, que dependería
+ * de si justo esos dos días fueron atípicos.
+ */
+export function ritmoSemanal(registros: Registro[], dias = 28): number | null {
+  const limite = sumarDias(aMediodia(new Date()), -dias);
+  const enVentana = registros.filter((r) => new Date(r.fecha_hora) >= limite);
+
+  // Con menos de 2 días distintos no hay pendiente que estimar.
+  const porDia = new Map<string, { x: number; y: number }>();
+  for (const r of enVentana) {
+    const fecha = new Date(r.fecha_hora);
+    const clave = claveDia(fecha);
+    // registros viene desc: el primero de cada día es el más reciente.
+    if (!porDia.has(clave)) {
+      porDia.set(clave, {
+        x: aMediodia(fecha).getTime() / 86_400_000,
+        y: r.peso.valor,
+      });
+    }
+  }
+
+  const puntos = [...porDia.values()];
+  if (puntos.length < 2) return null;
+
+  const n = puntos.length;
+  const mediaX = puntos.reduce((s, p) => s + p.x, 0) / n;
+  const mediaY = puntos.reduce((s, p) => s + p.y, 0) / n;
+
+  let numerador = 0;
+  let denominador = 0;
+  for (const p of puntos) {
+    numerador += (p.x - mediaX) * (p.y - mediaY);
+    denominador += (p.x - mediaX) ** 2;
+  }
+
+  // Todos los pesajes el mismo día: sin eje temporal no hay pendiente.
+  if (denominador === 0) return null;
+
+  const pendienteDiaria = numerador / denominador;
+  return Number((pendienteDiaria * 7).toFixed(2));
+}
+
+export function calcularProgresoMeta(
+  registros: Registro[],
+  meta: Meta | null,
+): ProgresoMeta | null {
+  if (!meta || registros.length === 0) return null;
+
+  const actual = registros[0].peso.valor;
+  const { objetivo, peso_inicial: pesoInicial } = meta;
+  const bajando = objetivo < pesoInicial;
+
+  const restanteReal = bajando ? actual - objetivo : objetivo - actual;
+  const alcanzada = restanteReal <= 0;
+
+  const recorrido = Math.abs(pesoInicial - objetivo);
+  // Con signo: alejarse del objetivo debe dar avance negativo (y acotarse a 0),
+  // no contar como progreso por el mero hecho de haberte movido.
+  const avanzado = bajando ? pesoInicial - actual : actual - pesoInicial;
+  // Si la meta se fijó en el peso ya alcanzado no hay recorrido que medir.
+  const porcentaje =
+    recorrido === 0
+      ? 100
+      : Math.max(0, Math.min(100, Math.round((avanzado / recorrido) * 100)));
+
+  const ritmo = ritmoSemanal(registros);
+
+  // Solo proyectamos si el ritmo empuja hacia la meta: con el signo contrario
+  // (o parado) la estimación sería negativa o infinita, y mentiría.
+  let semanasEstimadas: number | null = null;
+  if (!alcanzada && ritmo !== null && ritmo !== 0) {
+    const acercandose = bajando ? ritmo < 0 : ritmo > 0;
+    if (acercandose) {
+      semanasEstimadas = Math.ceil(restanteReal / Math.abs(ritmo));
+    }
+  }
+
+  return {
+    actual,
+    objetivo,
+    pesoInicial,
+    restante: Number(Math.max(0, restanteReal).toFixed(1)),
+    porcentaje: alcanzada ? 100 : porcentaje,
+    alcanzada,
+    bajando,
+    ritmoSemanal: ritmo,
+    semanasEstimadas,
+  };
 }
 
 export type DiaHeatmap = {

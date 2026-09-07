@@ -23,3 +23,14 @@ export type Registro = {
 
 /** Resultado de una Server Action: el error viaja como estado, no como excepción. */
 export type EstadoAccion = { ok: boolean; error?: string };
+
+/**
+ * Meta de peso del usuario. `peso_inicial` se congela al fijar la meta: sin él
+ * el progreso no tendría origen desde el que medir, y usar el primer registro
+ * histórico daría un porcentaje distinto cada vez que se cambia el objetivo.
+ */
+export type Meta = {
+  objetivo: number;
+  peso_inicial: number;
+  creado_en: string;
+};

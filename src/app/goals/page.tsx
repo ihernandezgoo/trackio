@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
-import { getRegistros } from "@/lib/actions";
-import { calcularRachaActual, diasConRegistro, generarHeatmap, diaClaveHoy } from "@/lib/stats";
+import { getMeta, getRegistros } from "@/lib/actions";
+import {
+  calcularProgresoMeta,
+  calcularRachaActual,
+  diasConRegistro,
+  generarHeatmap,
+  diaClaveHoy,
+} from "@/lib/stats";
 import HeatmapActividad from "@/components/HeatmapActividad";
+import TarjetaMeta from "@/components/TarjetaMeta";
 import { Check, Flame, Target } from "lucide-react";
 import { porcentajeDiasDelMes } from "@/lib/stats";
 
@@ -12,7 +19,9 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function GoalsPage() {
-  const registros = await getRegistros();
+  // Las dos lecturas son independientes: en paralelo evitamos encadenar esperas.
+  const [registros, meta] = await Promise.all([getRegistros(), getMeta()]);
+  const progresoMeta = calcularProgresoMeta(registros, meta);
   const heatmap = generarHeatmap(registros);
   const racha = calcularRachaActual(registros);
   const totalDias = diasConRegistro(registros).size;
@@ -29,6 +38,8 @@ export default async function GoalsPage() {
           Objetivos
         </h1>
       </header>
+
+      <TarjetaMeta progreso={progresoMeta} />
 
       <div className="grid gap-2.5 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] sm:items-stretch">
       <section

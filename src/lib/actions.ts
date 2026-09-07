@@ -8,6 +8,7 @@ import {
   PESO_MAXIMO,
   PESO_MINIMO,
   type EstadoAccion,
+  type Meta,
   type MomentoDia,
   type Registro,
 } from "@/lib/registros";
@@ -26,6 +27,11 @@ function revalidarVistas() {
 function registrosRef() {
   const { uid } = getUsuario();
   return getAdminDb().ref(`registros_peso/${uid}`);
+}
+
+function metaRef() {
+  const { uid } = getUsuario();
+  return getAdminDb().ref(`meta_peso/${uid}`);
 }
 
 export async function getRegistros(): Promise<Registro[]> {
@@ -81,6 +87,67 @@ export async function crearRegistroRapido(
     });
   } catch {
     return { ok: false, error: "No se pudo guardar. Inténtalo de nuevo." };
+  }
+
+  revalidarVistas();
+  return { ok: true };
+}
+
+export async function getMeta(): Promise<Meta | null> {
+  const snapshot = await metaRef().get();
+  return snapshot.exists() ? (snapshot.val() as Meta) : null;
+}
+
+export async function guardarMeta(
+  _estadoPrevio: EstadoAccion,
+  formData: FormData,
+): Promise<EstadoAccion> {
+  const texto = String(formData.get("objetivo") ?? "").trim().replace(",", ".");
+  const valor = Number(texto);
+
+  if (!texto || !Number.isFinite(valor)) {
+    return { ok: false, error: "Escribe un peso objetivo válido." };
+  }
+  if (valor < PESO_MINIMO || valor > PESO_MAXIMO) {
+    return {
+      ok: false,
+      error: `El objetivo debe estar entre ${PESO_MINIMO} y ${PESO_MAXIMO} kg.`,
+    };
+  }
+
+  // El punto de partida es el peso de hoy. Sin registros no hay desde dónde
+  // medir el progreso, así que la meta no tendría sentido todavía.
+  const registros = await getRegistros();
+  if (registros.length === 0) {
+    return { ok: false, error: "Registra tu peso antes de fijar un objetivo." };
+  }
+
+  const objetivo = Math.round(valor * 10) / 10;
+  const pesoInicial = registros[0].peso.valor;
+
+  if (objetivo === pesoInicial) {
+    return { ok: false, error: "El objetivo es tu peso actual. Elige otro." };
+  }
+
+  try {
+    await metaRef().set({
+      objetivo,
+      peso_inicial: pesoInicial,
+      creado_en: new Date().toISOString(),
+    });
+  } catch {
+    return { ok: false, error: "No se pudo guardar la meta. Inténtalo de nuevo." };
+  }
+
+  revalidarVistas();
+  return { ok: true };
+}
+
+export async function borrarMeta(): Promise<EstadoAccion> {
+  try {
+    await metaRef().remove();
+  } catch {
+    return { ok: false, error: "No se pudo borrar la meta. Inténtalo de nuevo." };
   }
 
   revalidarVistas();
