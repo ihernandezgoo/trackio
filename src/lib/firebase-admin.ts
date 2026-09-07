@@ -18,16 +18,46 @@ function parsePrivateKey(raw: string | undefined): string | undefined {
   return key.replace(/\\n/g, "\n");
 }
 
+/**
+ * Sin esto, una variable que falte en el hosting (Vercel) revienta dentro de
+ * cert() con un mensaje críptico sobre "project_id", y la página solo muestra
+ * "A server error occurred". Fallar aquí deja el motivo en los logs.
+ */
+function requireEnv(nombre: string): string {
+  const valor = process.env[nombre]?.trim();
+
+  if (!valor) {
+    throw new Error(
+      `Falta la variable de entorno ${nombre}. En local: copia .env.example a ` +
+        `.env.local y rellénala. En Vercel: Settings > Environment Variables ` +
+        `(marca Production) y vuelve a desplegar.`,
+    );
+  }
+
+  return valor;
+}
+
 function getAdminApp(): App {
   if (getApps().length) return getApps()[0];
 
+  const privateKey = parsePrivateKey(requireEnv("FIREBASE_PRIVATE_KEY"));
+
+  // Una clave sin saltos de línea reales no la acepta OpenSSL: suele pasar al
+  // pegarla en el panel de Vercel perdiendo el formato del JSON original.
+  if (!privateKey?.includes("\n")) {
+    throw new Error(
+      "FIREBASE_PRIVATE_KEY no tiene saltos de línea. Pega la clave completa " +
+        "tal cual viene en el JSON de la cuenta de servicio, incluidos los \\n.",
+    );
+  }
+
   return initializeApp({
     credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY),
+      projectId: requireEnv("FIREBASE_PROJECT_ID"),
+      clientEmail: requireEnv("FIREBASE_CLIENT_EMAIL"),
+      privateKey,
     }),
-    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+    databaseURL: requireEnv("NEXT_PUBLIC_FIREBASE_DATABASE_URL"),
   });
 }
 
